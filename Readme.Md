@@ -1,1 +1,129 @@
-{"metadata":{"kernelspec":{"language":"python","display_name":"Python 3","name":"python3"},"language_info":{"name":"python","version":"3.10.13","mimetype":"text/x-python","codemirror_mode":{"name":"ipython","version":3},"pygments_lexer":"ipython3","nbconvert_exporter":"python","file_extension":".py"},"kaggle":{"accelerator":"none","dataSources":[{"sourceId":8609739,"sourceType":"datasetVersion","datasetId":5152144}],"dockerImageVersionId":30732,"isInternetEnabled":false,"language":"python","sourceType":"notebook","isGpuEnabled":false}},"nbformat_minor":4,"nbformat":4,"cells":[{"cell_type":"markdown","source":"<div style=\"background-color: #7393B3; text-align: center; padding: 20px;\">\n  <p style=\"font-size: 34px; color: #333333;\">\n    <span style=\"color: #FF9933;\">Lok Sabha</span>\n    <span style=\"color: #FFFFFF;\"> India </span>\n    <span style=\"color: #0000FF;\">Election </span>\n    <span style=\"color: #FFFFFF;\">Results </span>\n    <span style=\"color: #008000;\">in 2024</span>\n  </p>\n</div>\n","metadata":{}},{"cell_type":"code","source":"import pandas as pd\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nimport numpy as np \nimport pandas as pd \n\n\nimport os\nfor dirname, _, filenames in os.walk('/kaggle/input'):\n    for filename in filenames:\n        print(os.path.join(dirname, filename))\n","metadata":{},"execution_count":null,"outputs":[]},{"cell_type":"code","source":"df = pd.read_csv(\"/kaggle/input/india-lok-sabha-election-results-2024/election_results_2024.csv\")","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:47:15.587192Z","iopub.execute_input":"2024-06-05T16:47:15.587746Z","iopub.status.idle":"2024-06-05T16:47:15.605522Z","shell.execute_reply.started":"2024-06-05T16:47:15.587704Z","shell.execute_reply":"2024-06-05T16:47:15.603866Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"code","source":"df.head()","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:47:16.041082Z","iopub.execute_input":"2024-06-05T16:47:16.041806Z","iopub.status.idle":"2024-06-05T16:47:16.063074Z","shell.execute_reply.started":"2024-06-05T16:47:16.041607Z","shell.execute_reply":"2024-06-05T16:47:16.061094Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"code","source":"df.info()","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:47:16.574958Z","iopub.execute_input":"2024-06-05T16:47:16.575439Z","iopub.status.idle":"2024-06-05T16:47:16.592064Z","shell.execute_reply.started":"2024-06-05T16:47:16.575402Z","shell.execute_reply":"2024-06-05T16:47:16.590629Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"code","source":"print(\"\\nMissing Values in the dataset:\")\nprint(df.isnull().sum())","metadata":{"_kg_hide-input":true,"execution":{"iopub.status.busy":"2024-06-05T16:47:17.491814Z","iopub.execute_input":"2024-06-05T16:47:17.492229Z","iopub.status.idle":"2024-06-05T16:47:17.501908Z","shell.execute_reply.started":"2024-06-05T16:47:17.492197Z","shell.execute_reply":"2024-06-05T16:47:17.500159Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"markdown","source":"# Leading parties\n","metadata":{}},{"cell_type":"code","source":"plt.figure(figsize=(14, 7))\nsns.countplot(y='Leading Party', data=df, order=df['Leading Party'].value_counts().index)\nplt.title('Distribution of Leading Parties')\nplt.xlabel('Count')\nplt.ylabel('Leading Party')\nplt.show()","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:47:18.35274Z","iopub.execute_input":"2024-06-05T16:47:18.353208Z","iopub.status.idle":"2024-06-05T16:47:19.870298Z","shell.execute_reply.started":"2024-06-05T16:47:18.353173Z","shell.execute_reply":"2024-06-05T16:47:19.868679Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"markdown","source":"# Trailing parties\n","metadata":{}},{"cell_type":"code","source":"plt.figure(figsize=(14, 7))\nsns.countplot(y='Trailing Party', data=df, order=df['Trailing Party'].value_counts().index)\nplt.title('Distribution of Trailing Parties')\nplt.xlabel('Count')\nplt.ylabel('Trailing Party')\nplt.show()","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:47:28.764175Z","iopub.execute_input":"2024-06-05T16:47:28.764608Z","iopub.status.idle":"2024-06-05T16:47:29.595474Z","shell.execute_reply.started":"2024-06-05T16:47:28.764576Z","shell.execute_reply":"2024-06-05T16:47:29.593589Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"markdown","source":"# Margin","metadata":{}},{"cell_type":"code","source":"plt.figure(figsize=(10, 6))\nsns.histplot(df['Margin'], bins=30, kde=True)\nplt.title('Distribution of Margin of Victory')\nplt.xlabel('Margin')\nplt.ylabel('Frequency')\nplt.show()","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:43:55.794712Z","iopub.execute_input":"2024-06-05T16:43:55.795246Z","iopub.status.idle":"2024-06-05T16:43:56.269121Z","shell.execute_reply.started":"2024-06-05T16:43:55.795207Z","shell.execute_reply":"2024-06-05T16:43:56.26747Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"markdown","source":"# top N constituencies with the largest margin of victory","metadata":{}},{"cell_type":"code","source":"\ndef plot_top_n_margins(df, n=10):\n\n    df['Margin'] = df['Margin'].replace('-', '0')\n    df['Margin'] = df['Margin'].str.replace(',', '').astype(int)\n    \n    top_n_margin = df.nlargest(n, 'Margin')\n    \n\n    plt.figure(figsize=(12, 6))\n    sns.barplot(x='Margin', y='Constituency', data=top_n_margin, hue='Leading Party')\n    plt.title(f'Top {n} Constituencies with the Largest Margin of Victory')\n    plt.xlabel('Margin')\n    plt.ylabel('Constituency')\n    plt.legend(title='Leading Party')\n    plt.show()\n\nplot_top_n_margins(df, n=10)","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:48:22.208306Z","iopub.execute_input":"2024-06-05T16:48:22.209525Z","iopub.status.idle":"2024-06-05T16:48:22.843022Z","shell.execute_reply.started":"2024-06-05T16:48:22.209473Z","shell.execute_reply":"2024-06-05T16:48:22.841406Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"markdown","source":"# Top N Candidates with the largest margin of victory","metadata":{}},{"cell_type":"code","source":"def top_n_leading_candidates(df, n=10):\n    top_n_candidates = df.nlargest(n, 'Margin')\n    plt.figure(figsize=(14, 8))\n    sns.barplot(x='Margin', y='Leading Candidate', data=top_n_candidates, hue='Leading Party')\n    plt.title(f'Top {n} Leading Candidates by Margin of Victory')\n    plt.xlabel('Margin')\n    plt.ylabel('Leading Candidate')\n    plt.legend(title='Leading Party')\n    plt.show()\n\ntop_n_leading_candidates(df, n=10)\n","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:45:52.927716Z","iopub.execute_input":"2024-06-05T16:45:52.928166Z","iopub.status.idle":"2024-06-05T16:45:53.623941Z","shell.execute_reply.started":"2024-06-05T16:45:52.928134Z","shell.execute_reply":"2024-06-05T16:45:53.622064Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"markdown","source":"# Top N Trailing Candidates by Margin of Defeat","metadata":{}},{"cell_type":"code","source":"def top_n_trailing_candidates(df, n=10):\n    trailing_margin = df.copy()\n    trailing_margin['Trailing Margin'] = trailing_margin['Margin'] * -1\n    top_n_candidates = trailing_margin.nsmallest(n, 'Trailing Margin')\n    plt.figure(figsize=(14, 8))\n    sns.barplot(x='Trailing Margin', y='Trailing Candidate', data=top_n_candidates, hue='Trailing Party')\n    plt.title(f'Top {n} Trailing Candidates by Margin of Defeat')\n    plt.xlabel('Trailing Margin')\n    plt.ylabel('Trailing Candidate')\n    plt.legend(title='Trailing Party')\n    plt.show()\n\ntop_n_trailing_candidates(df, n=10)\n","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:46:08.118967Z","iopub.execute_input":"2024-06-05T16:46:08.119408Z","iopub.status.idle":"2024-06-05T16:46:08.802042Z","shell.execute_reply.started":"2024-06-05T16:46:08.119374Z","shell.execute_reply":"2024-06-05T16:46:08.800329Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"code","source":"def party_wise_margin_distribution(df):\n    plt.figure(figsize=(14, 8))\n    sns.boxplot(x='Leading Party', y='Margin', data=df)\n    plt.title('Distribution of Margin of Victory by Leading Party')\n    plt.xlabel('Leading Party')\n    plt.ylabel('Margin')\n    plt.xticks(rotation=90)\n    plt.show()\n\nparty_wise_margin_distribution(df)\n","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:46:17.216347Z","iopub.execute_input":"2024-06-05T16:46:17.216811Z","iopub.status.idle":"2024-06-05T16:46:18.370204Z","shell.execute_reply.started":"2024-06-05T16:46:17.216777Z","shell.execute_reply":"2024-06-05T16:46:18.368656Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"markdown","source":"# Compare N leading and trailing parties across constituencies","metadata":{}},{"cell_type":"code","source":"\ndef leading_vs_trailing_parties(df, n=20):\n    leading_trailing = df.melt(id_vars=['Constituency'], value_vars=['Leading Party', 'Trailing Party'], \n                               var_name='Party Type', value_name='Party')\n    top_n_parties = leading_trailing['Party'].value_counts().index[:n]\n    leading_trailing = leading_trailing[leading_trailing['Party'].isin(top_n_parties)]\n    plt.figure(figsize=(14, 8))\n    sns.countplot(y='Party', hue='Party Type', data=leading_trailing, order=top_n_parties)\n    plt.title(f'Top {n} Parties by Leading and Trailing Status')\n    plt.xlabel('Count')\n    plt.ylabel('Party')\n    plt.show()\n\nleading_vs_trailing_parties(df, n=20)","metadata":{"execution":{"iopub.status.busy":"2024-06-05T16:49:50.549943Z","iopub.execute_input":"2024-06-05T16:49:50.550425Z","iopub.status.idle":"2024-06-05T16:49:51.217814Z","shell.execute_reply.started":"2024-06-05T16:49:50.550389Z","shell.execute_reply":"2024-06-05T16:49:51.21637Z"},"trusted":true},"execution_count":null,"outputs":[]},{"cell_type":"markdown","source":"# Thank you ♥","metadata":{}},{"cell_type":"code","source":"","metadata":{},"execution_count":null,"outputs":[]}]}
+Lok Sabha India Election Results in 2024
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np 
+import pandas as pd 
+
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+df = pd.read_csv("/kaggle/input/india-lok-sabha-election-results-2024/election_results_2024.csv")
+
+df.head()
+
+df.info()
+
+print("\nMissing Values in the dataset:")
+print(df.isnull().sum())
+
+# Leading parties
+
+plt.figure(figsize=(14, 7))
+sns.countplot(y='Leading Party', data=df, order=df['Leading Party'].value_counts().index)
+plt.title('Distribution of Leading Parties')
+plt.xlabel('Count')
+plt.ylabel('Leading Party')
+plt.show()
+
+# Trailing parties
+
+plt.figure(figsize=(14, 7))
+sns.countplot(y='Trailing Party', data=df, order=df['Trailing Party'].value_counts().index)
+plt.title('Distribution of Trailing Parties')
+plt.xlabel('Count')
+plt.ylabel('Trailing Party')
+plt.show()
+
+# Margin
+
+plt.figure(figsize=(10, 6))
+sns.histplot(df['Margin'], bins=30, kde=True)
+plt.title('Distribution of Margin of Victory')
+plt.xlabel('Margin')
+plt.ylabel('Frequency')
+plt.show()
+
+# top N constituencies with the largest margin of victory
+
+def plot_top_n_margins(df, n=10):
+
+    df['Margin'] = df['Margin'].replace('-', '0')
+    df['Margin'] = df['Margin'].str.replace(',', '').astype(int)
+    
+    top_n_margin = df.nlargest(n, 'Margin')
+    
+
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x='Margin', y='Constituency', data=top_n_margin, hue='Leading Party')
+    plt.title(f'Top {n} Constituencies with the Largest Margin of Victory')
+    plt.xlabel('Margin')
+    plt.ylabel('Constituency')
+    plt.legend(title='Leading Party')
+    plt.show()
+
+plot_top_n_margins(df, n=10)
+
+# Top N Candidates with the largest margin of victory
+
+def top_n_leading_candidates(df, n=10):
+    top_n_candidates = df.nlargest(n, 'Margin')
+    plt.figure(figsize=(14, 8))
+    sns.barplot(x='Margin', y='Leading Candidate', data=top_n_candidates, hue='Leading Party')
+    plt.title(f'Top {n} Leading Candidates by Margin of Victory')
+    plt.xlabel('Margin')
+    plt.ylabel('Leading Candidate')
+    plt.legend(title='Leading Party')
+    plt.show()
+
+top_n_leading_candidates(df, n=10)
+
+# Top N Trailing Candidates by Margin of Defeat
+
+def top_n_trailing_candidates(df, n=10):
+    trailing_margin = df.copy()
+    trailing_margin['Trailing Margin'] = trailing_margin['Margin'] * -1
+    top_n_candidates = trailing_margin.nsmallest(n, 'Trailing Margin')
+    plt.figure(figsize=(14, 8))
+    sns.barplot(x='Trailing Margin', y='Trailing Candidate', data=top_n_candidates, hue='Trailing Party')
+    plt.title(f'Top {n} Trailing Candidates by Margin of Defeat')
+    plt.xlabel('Trailing Margin')
+    plt.ylabel('Trailing Candidate')
+    plt.legend(title='Trailing Party')
+    plt.show()
+
+top_n_trailing_candidates(df, n=10)
+
+def party_wise_margin_distribution(df):
+    plt.figure(figsize=(14, 8))
+    sns.boxplot(x='Leading Party', y='Margin', data=df)
+    plt.title('Distribution of Margin of Victory by Leading Party')
+    plt.xlabel('Leading Party')
+    plt.ylabel('Margin')
+    plt.xticks(rotation=90)
+    plt.show()
+
+party_wise_margin_distribution(df)
+
+# Compare N leading and trailing parties across constituencies
+
+
+def leading_vs_trailing_parties(df, n=20):
+    leading_trailing = df.melt(id_vars=['Constituency'], value_vars=['Leading Party', 'Trailing Party'], 
+                               var_name='Party Type', value_name='Party')
+    top_n_parties = leading_trailing['Party'].value_counts().index[:n]
+    leading_trailing = leading_trailing[leading_trailing['Party'].isin(top_n_parties)]
+    plt.figure(figsize=(14, 8))
+    sns.countplot(y='Party', hue='Party Type', data=leading_trailing, order=top_n_parties)
+    plt.title(f'Top {n} Parties by Leading and Trailing Status')
+    plt.xlabel('Count')
+    plt.ylabel('Party')
+    plt.show()
+
+leading_vs_trailing_parties(df, n=20)
+
+# Thank you ♥
